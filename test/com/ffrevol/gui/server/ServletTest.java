@@ -2,18 +2,15 @@ package com.ffrevol.gui.server;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
-
+import static org.mockito.Mockito.when;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FileReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectOutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintWriter;
@@ -57,20 +54,31 @@ public class ServletTest
 	
 	
 	@Test
-	public void doPost() throws Exception
+	public void checkPostContent() throws Exception
 	{	
 		Map<String, Object> param = new HashMap<String, Object>();	
 		OutputStreamDumper out = new OutputStreamDumper();
 		param.put("dumper", out);
 		servlet = new UploadServer(param);
-		when(request.getInputStream()).thenReturn(createServletInputStream("input text value") );
+		when(request.getInputStream()).thenReturn(createServletInputStream("<PROVISIONING>input text value</PROVISIONING>") );
 		servlet.doPost(request, response);		
 		BufferedReader d = new BufferedReader(new InputStreamReader(out.input()));
         String val = d.readLine();
-        assertTrue(val, val.startsWith("input text value"));
+        assertTrue(val, val.startsWith("<PROVISIONING>input"));
         verify(response).setStatus(200);
-        
-		
+	}
+	
+	@Test
+	public void checkPostFileCreation() throws Exception
+	{	
+		Map<String, Object> param = new HashMap<String, Object>();
+		DumperToFile out = new DumperToFile("prov.xml");
+		param.put("dumper", out);		
+		servlet = new UploadServer(param);
+		when(request.getInputStream()).thenReturn(createServletInputStream("<PROVISIONING>input text value</PROVISIONING>") );
+		servlet.doPost(request, response);		
+		File file = new File("prov.xml");
+		assertTrue(file.getAbsolutePath(),file.canRead());
 	}
 	
 	public ServletInputStream createServletInputStream(String

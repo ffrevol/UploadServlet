@@ -21,10 +21,13 @@ public class DumperToFile implements Dumper
 	{
 		BufferedReader read = new BufferedReader(new InputStreamReader(in));
 		FileWriter writer = new FileWriter(realPath);
-		while(read.ready())
-		{
-			writer.write(read.readLine());
-		}
+		char[] cbuf = new char[128];
+		int readc;
+		while((readc = read.read(cbuf)) > 0)
+		{	
+			System.out.println("print " + readc + " char" + cbuf); 
+			writer.write(cbuf);
+		}		
 		writer.close();
 
 	}

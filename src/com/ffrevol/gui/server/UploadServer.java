@@ -1,8 +1,11 @@
 package com.ffrevol.gui.server;
 
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -16,9 +19,9 @@ public class UploadServer extends HttpServlet
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private static final String DESTINATION_FILE_PATH = "/savedProv.xml";
+	private static final String DESTINATION_FILE_PATH = "prov.xml";
 	private Dumper dumper;
-
+	
 	public UploadServer()
 	{		
 		dumper = DefaultDumper();
@@ -26,6 +29,11 @@ public class UploadServer extends HttpServlet
 
 	public UploadServer(Map<String, Object> param)
 	{
+		initParameter(param);
+	}
+
+	private void initParameter(Map<String, Object> param)
+	{		
 		Object obj = param.get("dumper");
 		if(obj == null)
 		{
@@ -48,7 +56,12 @@ public class UploadServer extends HttpServlet
 			throws ServletException, IOException
 	{
 		PrintWriter out = resp.getWriter();
-		out.print("<PROVISIONING>.......</PROVISIONING>");
+		FileReader prov = new FileReader(DESTINATION_FILE_PATH);
+		char[] cbuf = new char[128];		
+		while(prov.read(cbuf) > 0)
+		{	 
+			out.print(cbuf);
+		}
 	}
 
 	@Override
